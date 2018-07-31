@@ -43,7 +43,7 @@ class AdultDvdEmpire(Agent.Movies):
             return None
 
     def getStringContentFromXPath(self, source, query):
-        return source.xpath(query)[0].text #.replace('"', '').strip()
+        return source.xpath(query)[0].text
 
     def getAnchorUrlFromXPath(self, source, query):
         anchor = source.xpath(query)
@@ -207,23 +207,31 @@ class AdultDvdEmpire(Agent.Movies):
 
             # Set dates
             releaseDate = None
+            releaseYear = None
             try:
                releaseDate = self.getDateFromString(html.xpath('//small[text()="Released:"]/parent::li/text()')[0].replace('"', '').strip())
             except:
                 pass
-            if releaseDate is not None and releaseDate is not '':
+            releaseYear = self.getDateFromString(html.xpath('//small[text()="Production Year:"]/parent::li/text()')[0].replace('"', '').strip())
+            if releaseDate is not None:
                 metadata.originally_available_at = releaseDate
-                metadata.year = releaseDate.year
             else:
-                releaseYear = self.getDateFromString(html.xpath('//small[text()="Production Year:"]/parent::li/text()')[0].replace('"', '').strip())
-                metadata.year = releaseYear.year
                 metadata.originally_available_at = releaseYear.date
+            metadata.year = releaseYear.year
             metadata.content_rating = 'Adult'
-            #metadata.rating = 5
-            #metadata.rating_image = 'image:url(https://thrifty-production.s3.amazonaws.com/uploads/store/logo/9d4dd375-3d24-4234-a05f-1bc1a00d9887/adultempirecom.png)'
         except Exception, e:
             Log.Error('Error obtaining basic data for item with id %s (%s) [%s] ', metadata.id, url, e.message)
 
+        try:
+            #Get ratings
+            #metadata.rating = 5
+            metadata.rating_image = 'image:url(https://thrifty-production.s3.amazonaws.com/uploads/store/logo/9d4dd375-3d24-4234-a05f-1bc1a00d9887/adultempirecom.png)'
+            audienceRating = float(html.xpath('//h2[contains(text(),"Average Rating")]')[0].text.strip('\n').strip().strip('Audience Rating: '))
+            metadata.audience_rating = audienceRating / 5 * 10
+            #metadata.audience_rating_image
+        except Exception, e:
+            Log.Error('Error obtaining ratings data for item with id %s (%s) [%s]', metadata.id, url, e.message)
+            
         # Set the summary
         try:
             paragraph = html.xpath('//h4[@class="spacing-bottom text-dark synopsis"]/parent::div')
