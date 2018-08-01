@@ -226,7 +226,7 @@ class AdultDvdEmpire(Agent.Movies):
         try:
             #Get ratings
             metadata.rating_image = 'image:url(' + ADE_RATING_IMAGE + ')'
-            rating = float(html.xpath('//h2[contains(text(),"Average Rating")]')[0].text.strip('\n').strip().strip('Audience Rating: '))
+            rating = float(html.xpath('//h2[contains(text(),"Average Rating")]')[0].text.strip('\n').strip('Average Rating '))
             metadata.rating = rating / 5 * 10
             #metadata.audience_rating_image
         except Exception, e:
