@@ -10,6 +10,7 @@ ADE_BASE_URL = 'http://www.adultdvdempire.com/'
 ADE_MOVIE_INFO = ADE_BASE_URL + '%s'
 ADE_SEARCH_URL = ADE_BASE_URL + 'allsearch/search?q=%s'
 ADE_STAR_PHOTO = 'https://imgs1cdn.adultempire.com/actors/%s.jpg'
+ADE_RATING_IMAGE = 'https://thrifty-production.s3.amazonaws.com/uploads/store/logo/9d4dd375-3d24-4234-a05f-1bc1a00d9887/adultempirecom.png'
 
 REQUEST_DELAY = 0       # Delay used when requesting HTML, may be good to have to prevent being banned from the site
 
@@ -224,10 +225,9 @@ class AdultDvdEmpire(Agent.Movies):
 
         try:
             #Get ratings
-            #metadata.rating = 5
-            metadata.rating_image = 'image:url(https://thrifty-production.s3.amazonaws.com/uploads/store/logo/9d4dd375-3d24-4234-a05f-1bc1a00d9887/adultempirecom.png)'
-            audienceRating = float(html.xpath('//h2[contains(text(),"Average Rating")]')[0].text.strip('\n').strip().strip('Audience Rating: '))
-            metadata.audience_rating = audienceRating / 5 * 10
+            metadata.rating_image = 'image:url(' + ADE_RATING_IMAGE + ')'
+            rating = float(html.xpath('//h2[contains(text(),"Average Rating")]')[0].text.strip('\n').strip().strip('Audience Rating: '))
+            metadata.rating = rating / 5 * 10
             #metadata.audience_rating_image
         except Exception, e:
             Log.Error('Error obtaining ratings data for item with id %s (%s) [%s]', metadata.id, url, e.message)
